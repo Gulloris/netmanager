@@ -1,0 +1,8 @@
+target/
+*.class
+*.log
+.idea/
+*.iml
+.mvn/
+.DS_Store
+application-local.properties

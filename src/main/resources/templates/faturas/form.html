@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::section}, 'Nova Fatura')}"
+      lang="pt-BR">
+<body>
+<section th:fragment="content">
+
+    <div class="page-header">
+        <div><h1 class="page-title">Nova Fatura</h1></div>
+        <a th:href="@{/faturas}" class="btn btn-outline">← Voltar</a>
+    </div>
+
+    <div class="section-card" style="max-width:600px">
+        <form action="/faturas/nova" method="post" class="form-grid">
+
+            <div class="form-group full-width">
+                <label>Cliente *</label>
+                <select name="clienteId" required class="form-control" id="selectCliente">
+                    <option value="">— Selecione o Cliente —</option>
+                    <option th:each="c : ${clientes}"
+                            th:value="${c.id}"
+                            th:text="${c.nome + (c.plano != null ? ' — ' + c.plano.nome : '')}"
+                            th:attr="data-valor=${c.plano != null ? c.plano.valor : ''}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Valor (R$) *</label>
+                <input type="number" name="valor" id="inputValor" required class="form-control"
+                       step="0.01" min="0" placeholder="0,00"/>
+            </div>
+
+            <div class="form-group">
+                <label>Data de Vencimento *</label>
+                <input type="date" name="dataVencimento" required class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label>Referência (Mês/Ano)</label>
+                <input type="text" name="referenciaMes" class="form-control" placeholder="Ex: 06/2025"/>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Observação</label>
+                <textarea name="observacao" class="form-control" rows="2" placeholder="Opcional"></textarea>
+            </div>
+
+            <div class="form-actions full-width">
+                <a th:href="@{/faturas}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary">🧾 Criar Fatura</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Preenche valor automaticamente ao selecionar cliente
+        document.getElementById('selectCliente').addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            const val = opt.getAttribute('data-valor');
+            if (val) document.getElementById('inputValor').value = val;
+        });
+    </script>
+
+</section>
+</body>
+</html>

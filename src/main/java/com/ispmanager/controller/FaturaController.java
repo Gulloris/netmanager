@@ -1,0 +1,90 @@
+package com.ispmanager.controller;
+
+import com.ispmanager.model.Cliente;
+import com.ispmanager.model.Fatura;
+import com.ispmanager.service.ClienteService;
+import com.ispmanager.service.FaturaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
+
+@Controller
+@RequestMapping("/faturas")
+public class FaturaController {
+
+    @Autowired private FaturaService faturaService;
+    @Autowired private ClienteService clienteService;
+
+    @GetMapping
+    public String listar(@RequestParam(defaultValue = "todas") String filtro, Model model) {
+        switch (filtro) {
+            case "pendentes" -> model.addAttribute("faturas", faturaService.listarPendentes());
+            case "vencidas"  -> model.addAttribute("faturas", faturaService.listarVencidas());
+            case "pagas"     -> model.addAttribute("faturas", faturaService.listarPagas());
+            default          -> model.addAttribute("faturas", faturaService.listarTodas());
+        }
+        model.addAttribute("currentPage", "faturas");
+        model.addAttribute("filtro", filtro);
+        model.addAttribute("qtdPendentes", faturaService.contarPendentes());
+        model.addAttribute("qtdVencidas", faturaService.contarVencidas());
+        return "faturas/lista";
+    }
+
+    @GetMapping("/nova")
+    public String formularioNovo(Model model) {
+        model.addAttribute("fatura", new Fatura());
+        model.addAttribute("clientes", clienteService.listarTodos());
+        return "faturas/form";
+    }
+
+    @PostMapping("/nova")
+    public String salvar(@RequestParam Long clienteId,
+                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataVencimento,
+                         @RequestParam java.math.BigDecimal valor,
+                         @RequestParam(required = false) String referenciaMes,
+                         @RequestParam(required = false) String observacao,
+                         RedirectAttributes ra) {
+
+        Cliente cliente = clienteService.buscarPorId(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        Fatura fatura = new Fatura();
+        fatura.setCliente(cliente);
+        fatura.setDataVencimento(dataVencimento);
+        fatura.setValor(valor);
+        fatura.setReferenciaMes(referenciaMes);
+        fatura.setObservacao(observacao);
+
+        faturaService.salvar(fatura);
+        ra.addFlashAttribute("sucesso", "Fatura criada com sucesso!");
+        return "redirect:/faturas";
+    }
+
+    @PostMapping("/{id}/baixa")
+    public String darBaixa(@PathVariable Long id,
+                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataPagamento,
+                           RedirectAttributes ra) {
+        faturaService.darBaixa(id, dataPagamento);
+        ra.addFlashAttribute("sucesso", "Pagamento registrado com sucesso!");
+        return "redirect:/faturas";
+    }
+
+    @PostMapping("/{id}/cancelar")
+    public String cancelar(@PathVariable Long id, RedirectAttributes ra) {
+        faturaService.cancelar(id);
+        ra.addFlashAttribute("sucesso", "Fatura cancelada.");
+        return "redirect:/faturas";
+    }
+
+    @PostMapping("/gerar/{clienteId}")
+    public String gerarFatura(@PathVariable Long clienteId, RedirectAttributes ra) {
+        faturaService.gerarFaturaParaCliente(clienteId);
+        ra.addFlashAttribute("sucesso", "Fatura gerada com sucesso!");
+        return "redirect:/faturas";
+    }
+}
