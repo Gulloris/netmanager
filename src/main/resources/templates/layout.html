@@ -17,12 +17,20 @@
         <span class="logo-icon">⚡</span>
         <span class="logo-text">NetManager</span>
     </div>
-    <ul class="nav-links">
-   <li><a th:href="@{/}" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
-<li><a th:href="@{/clientes}" th:classappend="${currentPage == 'clientes' ? 'active' : ''}">
-<li><a th:href="@{/planos}" th:classappend="${currentPage == 'planos' ? 'active' : ''}">
-<li><a th:href="@{/faturas}" th:classappend="${currentPage == 'faturas' ? 'active' : ''}">
-    </ul>
+   <ul class="nav-links">
+    <li><a th:href="@{/}" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
+        <span class="nav-icon">📊</span> Dashboard
+    </a></li>
+    <li><a th:href="@{/clientes}" th:classappend="${currentPage == 'clientes' ? 'active' : ''}">
+        <span class="nav-icon">👥</span> Clientes
+    </a></li>
+    <li><a th:href="@{/planos}" th:classappend="${currentPage == 'planos' ? 'active' : ''}">
+        <span class="nav-icon">📶</span> Planos
+    </a></li>
+    <li><a th:href="@{/faturas}" th:classappend="${currentPage == 'faturas' ? 'active' : ''}">
+        <span class="nav-icon">💰</span> Faturas
+    </a></li>
+</ul>
 </nav>
 
 <main class="main-content">
