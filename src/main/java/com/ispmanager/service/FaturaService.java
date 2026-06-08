@@ -64,7 +64,13 @@ public class FaturaService {
         fatura.setDataPagamento(dataPagamento != null ? dataPagamento : LocalDate.now());
         return faturaRepository.save(fatura);
     }
-
+    public Fatura estornar(Long faturaId) {
+        Fatura fatura = faturaRepository.findById(faturaId)
+                .orElseThrow(() -> new RuntimeException("Fatura não encontrada: " + faturaId));
+         fatura.setStatus(StatusFatura.PENDENTE);
+         fatura.setDataPagamento(null);
+         return faturaRepository.save(fatura);
+}
     public Fatura cancelar(Long faturaId) {
         Fatura fatura = faturaRepository.findById(faturaId)
                 .orElseThrow(() -> new RuntimeException("Fatura não encontrada: " + faturaId));

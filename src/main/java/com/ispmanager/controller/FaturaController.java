@@ -73,6 +73,12 @@ public class FaturaController {
         ra.addFlashAttribute("sucesso", "Pagamento registrado com sucesso!");
         return "redirect:/faturas";
     }
+    @PostMapping("/{id}/estornar")
+public String estornar(@PathVariable Long id, RedirectAttributes ra) {
+    faturaService.estornar(id);
+    ra.addFlashAttribute("sucesso", "Pagamento estornado com sucesso!");
+    return "redirect:/faturas";
+}
 
     @PostMapping("/{id}/cancelar")
     public String cancelar(@PathVariable Long id, RedirectAttributes ra) {

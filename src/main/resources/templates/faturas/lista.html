@@ -76,6 +76,11 @@
                               th:action="@{'/faturas/' + ${f.id} + '/cancelar'}" method="post" style="display:inline">
                             <button type="submit" class="btn btn-sm btn-ghost" onclick="return confirm('Cancelar fatura?')">✖</button>
                         </form>
+                        <form th:if="${f.status.name() == 'PAGO'}"
+                              th:action="@{'/faturas/' + ${f.id} + '/estornar'}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Estornar pagamento?')">↩ Estornar</button>
+                        </form>
+                    </td>
                     </td>
                 </tr>
             </tbody>
