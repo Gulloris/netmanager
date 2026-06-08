@@ -42,28 +42,24 @@ public class FaturaController {
         return "faturas/form";
     }
 
-    @PostMapping("/nova")
-    public String salvar(@RequestParam Long clienteId,
-                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataVencimento,
-                         @RequestParam java.math.BigDecimal valor,
-                         @RequestParam(required = false) String referenciaMes,
-                         @RequestParam(required = false) String observacao,
-                         RedirectAttributes ra) {
+ @PostMapping("/nova")
+public String salvar(@RequestParam Long clienteId,
+                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataVencimento,
+                     @RequestParam java.math.BigDecimal valor,
+                     @RequestParam(required = false) String referenciaMes,
+                     @RequestParam(required = false) String observacao,
+                     @RequestParam(required = false) Boolean gerarAnual,
+                     RedirectAttributes ra) {
+    Cliente cliente = clienteService.buscarPorId(clienteId)
+            .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        Cliente cliente = clienteService.buscarPorId(clienteId)
-                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+    faturaService.salvarComOpcaoAnual(cliente, dataVencimento, valor, referenciaMes, observacao, gerarAnual);
 
-        Fatura fatura = new Fatura();
-        fatura.setCliente(cliente);
-        fatura.setDataVencimento(dataVencimento);
-        fatura.setValor(valor);
-        fatura.setReferenciaMes(referenciaMes);
-        fatura.setObservacao(observacao);
-
-        faturaService.salvar(fatura);
-        ra.addFlashAttribute("sucesso", "Fatura criada com sucesso!");
-        return "redirect:/faturas";
-    }
+    ra.addFlashAttribute("sucesso", Boolean.TRUE.equals(gerarAnual)
+            ? "12 faturas geradas com sucesso!"
+            : "Fatura criada com sucesso!");
+    return "redirect:/faturas";
+}
 
     @PostMapping("/{id}/baixa")
     public String darBaixa(@PathVariable Long id,

@@ -125,4 +125,31 @@ public class FaturaService {
         BigDecimal total = faturaRepository.totalRecebidoMesAtual();
         return total != null ? total : BigDecimal.ZERO;
     }
+    public void salvarComOpcaoAnual(Cliente cliente, LocalDate dataVencimento, 
+                                 java.math.BigDecimal valor, String referenciaMes, 
+                                 String observacao, Boolean gerarAnual) {
+    // Salva a fatura principal
+    Fatura fatura = new Fatura();
+    fatura.setCliente(cliente);
+    fatura.setDataVencimento(dataVencimento);
+    fatura.setValor(valor);
+    fatura.setReferenciaMes(referenciaMes);
+    fatura.setObservacao(observacao);
+    salvar(fatura);
+
+    // Se checkbox marcado, gera mais 12 faturas mensais
+    if (Boolean.TRUE.equals(gerarAnual)) {
+        for (int i = 1; i <= 12; i++) {
+            LocalDate proximoVencimento = dataVencimento.plusMonths(i);
+            Fatura proxima = new Fatura();
+            proxima.setCliente(cliente);
+            proxima.setDataVencimento(proximoVencimento);
+            proxima.setValor(valor);
+            proxima.setObservacao(observacao);
+            proxima.setReferenciaMes(proximoVencimento
+                    .format(java.time.format.DateTimeFormatter.ofPattern("MM/yyyy")));
+            salvar(proxima);
+        }
+    }
+}
 }
