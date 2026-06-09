@@ -6,6 +6,23 @@
 <section th:fragment="content">
 
     <div class="page-header">
+        <!-- Filtro de datas -->
+<form method="get" action="/faturas" style="display:flex;gap:10px;align-items:flex-end;margin-bottom:20px;flex-wrap:wrap;">
+    <input type="hidden" name="filtro" th:value="${filtro}"/>
+    <div class="form-group" style="margin:0">
+        <label>Data Início</label>
+        <input type="date" name="dataInicio" class="form-control"
+               th:value="${dataInicio}"/>
+    </div>
+    <div class="form-group" style="margin:0">
+        <label>Data Fim</label>
+        <input type="date" name="dataFim" class="form-control"
+               th:value="${dataFim}"/>
+    </div>
+    <button type="submit" class="btn btn-primary">🔍 Filtrar</button>
+    <a th:href="@{/faturas(filtro=${filtro})}" class="btn btn-ghost">✖ Limpar</a>
+    <button type="button" class="btn btn-outline" onclick="window.print()">🖨️ Imprimir</button>
+</form>
         <div>
             <h1 class="page-title">Faturas</h1>
             <p class="page-subtitle" th:text="${faturas.size() + ' fatura(s) encontrada(s)'}"></p>

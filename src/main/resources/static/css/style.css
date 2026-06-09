@@ -397,3 +397,12 @@ textarea.form-control { resize: vertical; }
     .form-grid { grid-template-columns: 1fr; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
 }
+/* -- PRINT -- */
+@media print {
+    .sidebar, .page-header .btn, form, .filter-tabs, .actions-cell, .btn { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    body { background: #fff; color: #000; }
+    .table th, .table td { color: #000; border-color: #ccc; }
+    .section-card { border: 1px solid #ccc; background: #fff; }
+    .badge { border: 1px solid #ccc; color: #000 !important; background: #fff !important; }
+}

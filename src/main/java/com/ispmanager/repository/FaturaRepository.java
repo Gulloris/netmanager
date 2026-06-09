@@ -29,4 +29,10 @@ public interface FaturaRepository extends JpaRepository<Fatura, Long> {
 
     @Query("SELECT COALESCE(SUM(f.valor), 0) FROM Fatura f WHERE f.status = 'PAGO' AND MONTH(f.dataPagamento) = MONTH(CURRENT_DATE) AND YEAR(f.dataPagamento) = YEAR(CURRENT_DATE)")
     java.math.BigDecimal totalRecebidoMesAtual();
+
+    @Query("SELECT f FROM Fatura f JOIN FETCH f.cliente c LEFT JOIN FETCH c.plano WHERE f.dataVencimento BETWEEN :inicio AND :fim ORDER BY f.dataVencimento ASC")
+    List<Fatura> findByPeriodo(@Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
+
+    @Query("SELECT f FROM Fatura f JOIN FETCH f.cliente c LEFT JOIN FETCH c.plano WHERE f.status = :status AND f.dataVencimento BETWEEN :inicio AND :fim ORDER BY f.dataVencimento ASC")
+    List<Fatura> findByStatusEPeriodo(@Param("status") StatusFatura status, @Param("inicio") LocalDate inicio, @Param("fim") LocalDate fim);
 }

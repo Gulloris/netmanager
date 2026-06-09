@@ -152,4 +152,11 @@ public class FaturaService {
         }
     }
 }
+    public List<Fatura> listarPorPeriodo(LocalDate inicio, LocalDate fim) {
+    return faturaRepository.findByPeriodo(inicio, fim);
+}
+
+    public List<Fatura> listarPorStatusEPeriodo(StatusFatura status, LocalDate inicio, LocalDate fim) {
+    return faturaRepository.findByStatusEPeriodo(status, inicio, fim);
+}
 }

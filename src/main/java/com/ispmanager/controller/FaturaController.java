@@ -21,19 +21,37 @@ public class FaturaController {
     @Autowired private ClienteService clienteService;
 
     @GetMapping
-    public String listar(@RequestParam(defaultValue = "todas") String filtro, Model model) {
+public String listar(@RequestParam(defaultValue = "todas") String filtro,
+                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+                     @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+                     Model model) {
+
+    boolean temFiltroData = dataInicio != null && dataFim != null;
+
+    if (temFiltroData) {
+        switch (filtro) {
+            case "pendentes" -> model.addAttribute("faturas", faturaService.listarPorStatusEPeriodo(Fatura.StatusFatura.PENDENTE, dataInicio, dataFim));
+            case "vencidas"  -> model.addAttribute("faturas", faturaService.listarPorStatusEPeriodo(Fatura.StatusFatura.VENCIDO, dataInicio, dataFim));
+            case "pagas"     -> model.addAttribute("faturas", faturaService.listarPorStatusEPeriodo(Fatura.StatusFatura.PAGO, dataInicio, dataFim));
+            default          -> model.addAttribute("faturas", faturaService.listarPorPeriodo(dataInicio, dataFim));
+        }
+    } else {
         switch (filtro) {
             case "pendentes" -> model.addAttribute("faturas", faturaService.listarPendentes());
             case "vencidas"  -> model.addAttribute("faturas", faturaService.listarVencidas());
             case "pagas"     -> model.addAttribute("faturas", faturaService.listarPagas());
             default          -> model.addAttribute("faturas", faturaService.listarTodas());
         }
-        model.addAttribute("currentPage", "faturas");
-        model.addAttribute("filtro", filtro);
-        model.addAttribute("qtdPendentes", faturaService.contarPendentes());
-        model.addAttribute("qtdVencidas", faturaService.contarVencidas());
-        return "faturas/lista";
     }
+
+    model.addAttribute("currentPage", "faturas");
+    model.addAttribute("filtro", filtro);
+    model.addAttribute("dataInicio", dataInicio);
+    model.addAttribute("dataFim", dataFim);
+    model.addAttribute("qtdPendentes", faturaService.contarPendentes());
+    model.addAttribute("qtdVencidas", faturaService.contarVencidas());
+    return "faturas/lista";
+}
 
     @GetMapping("/nova")
     public String formularioNovo(Model model) {
