@@ -31,6 +31,11 @@
     <li><a th:href="@{/faturas}" th:classappend="${currentPage == 'faturas' ? 'active' : ''}">
         <span class="nav-icon">💰</span> Faturas
     </a></li>
+    <li sec:authorize="hasRole('ADMIN')">
+        <a th:href="@{/usuarios}" th:classappend="${currentPage == 'usuarios' ? 'active' : ''}">
+            <span class="nav-icon">🔐</span> Usuários
+        </a>
+    </li>
 </ul>
 
 <div class="sidebar-user">
@@ -50,7 +55,18 @@
             <span>✅</span> <span th:text="${sucesso}"></span>
         </div>
         <div th:if="${erro}" class="alert alert-error">
-            <span>❌</span> <span th:text="${erro}"></span>
+            <span>❌</span>
+            <span th:if="${param.erro == null}" th:text="${erro}"></span>
+            <span th:if="${param.erro != null and param.erro[0] == 'proprio'}">Você não pode desativar o próprio usuário.</span>
+        </div>
+        <div th:if="${param.sucesso == 'criado'}" class="alert alert-success">
+            <span>✅</span> Usuário cadastrado com sucesso.
+        </div>
+        <div th:if="${param.sucesso == 'atualizado'}" class="alert alert-success">
+            <span>✅</span> Usuário atualizado com sucesso.
+        </div>
+        <div th:if="${param.sucesso == 'status'}" class="alert alert-success">
+            <span>✅</span> Status do usuário atualizado.
         </div>
 
         <div th:replace="${content}">Conteúdo</div>
