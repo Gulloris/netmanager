@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::section}, 'Cadastro de Cliente')}"
+      lang="pt-BR">
+<body>
+<section th:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title" th:text="${cliente.id != null ? 'Editar Cliente' : 'Novo Cliente'}">Novo Cliente</h1>
+        </div>
+        <a th:href="@{/clientes}" class="btn btn-outline">← Voltar</a>
+    </div>
+
+    <div class="section-card">
+        <form th:action="${cliente.id != null ? '/clientes/' + cliente.id + '/editar' : '/clientes/novo'}"
+      th:object="${cliente}"
+      method="post" class="form-grid">
+
+            <div class="form-group full-width">
+                <label>Nome Completo *</label>
+                <input type="text" name="nome" th:value="${cliente.nome}" required class="form-control" placeholder="Nome do cliente"/>
+                <span th:if="${#fields.hasErrors('nome')}" class="field-error" th:errors="*{nome}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>CPF / CNPJ</label>
+                <input type="text" name="cpf" th:value="${cliente.cpf}" class="form-control" placeholder="000.000.000-00"/>
+            </div>
+
+            <div class="form-group">
+                <label>Telefone</label>
+                <input type="text" name="telefone" th:value="${cliente.telefone}" class="form-control" placeholder="(82) 99999-9999"/>
+            </div>
+
+            <div class="form-group full-width">
+                <label>E-mail</label>
+                <input type="email" name="email" th:value="${cliente.email}" class="form-control" placeholder="cliente@email.com"/>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Endereço</label>
+                <input type="text" name="endereco" th:value="${cliente.endereco}" class="form-control" placeholder="Rua, número, complemento"/>
+            </div>
+
+            <div class="form-group">
+                <label>Bairro</label>
+                <input type="text" name="bairro" th:value="${cliente.bairro}" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label>Cidade</label>
+                <input type="text" name="cidade" th:value="${cliente.cidade}" class="form-control"/>
+            </div>
+
+            <div class="form-group">
+                <label>Plano de Internet</label>
+                <select name="planoId" class="form-control">
+                    <option value="">— Selecionar Plano —</option>
+                    <option th:each="p : ${planos}"
+                            th:value="${p.id}"
+                            th:text="${p.nome + ' — ' + p.velocidadeMbps + ' Mbps — R$ ' + #numbers.formatDecimal(p.valor, 1, 'POINT', 2, 'COMMA')}"
+                            th:selected="${cliente.plano != null and cliente.plano.id == p.id}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Dia de Vencimento</label>
+                <input type="number" name="diaVencimento" th:value="${cliente.diaVencimento}" min="1" max="31"
+                       class="form-control" placeholder="Ex: 10"/>
+            </div>
+
+            <div class="form-actions full-width">
+                <a th:href="@{/clientes}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    <span th:text="${cliente.id != null ? '💾 Salvar Alterações' : '✅ Cadastrar Cliente'}"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::section}, 'Cadastro de Plano')}"
+      lang="pt-BR">
+<body>
+<section th:fragment="content">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title" th:text="${plano.id != null ? 'Editar Plano' : 'Novo Plano'}">Novo Plano</h1>
+        </div>
+        <a th:href="@{/planos}" class="btn btn-outline">← Voltar</a>
+    </div>
+
+    <div class="section-card" style="max-width:600px">
+        <form th:action="${plano.id != null ? '/planos/' + plano.id + '/editar' : '/planos/novo'}"
+              method="post" class="form-grid">
+
+            <div class="form-group full-width">
+                <label>Nome do Plano *</label>
+                <input type="text" name="nome" th:value="${plano.nome}" required class="form-control"
+                       placeholder="Ex: Plano Básico, Plano Família..."/>
+            </div>
+
+            <div class="form-group">
+                <label>Velocidade (Mbps) *</label>
+                <input type="number" name="velocidadeMbps" th:value="${plano.velocidadeMbps}" required
+                       class="form-control" placeholder="Ex: 100" min="1"/>
+            </div>
+
+            <div class="form-group">
+                <label>Valor Mensal (R$) *</label>
+                <input type="number" name="valor" th:value="${plano.valor}" required
+                       class="form-control" placeholder="Ex: 89.90" step="0.01" min="0"/>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Descrição</label>
+                <textarea name="descricao" class="form-control" rows="3"
+                          placeholder="Descreva o plano (opcional)" th:text="${plano.descricao}"></textarea>
+            </div>
+
+            <div class="form-actions full-width">
+                <a th:href="@{/planos}" class="btn btn-ghost">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    <span th:text="${plano.id != null ? '💾 Salvar Alterações' : '✅ Criar Plano'}"></span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+</section>
+</body>
+</html>

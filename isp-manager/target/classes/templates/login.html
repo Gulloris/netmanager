@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Entrar | NetManager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body class="login-body">
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">NetManager</span>
+        </div>
+        <p class="login-subtitle">Entre para gerenciar seus clientes e planos</p>
+
+        <div th:if="${param.erro}" class="alert alert-error">
+            <span>❌</span> <span>Usuário ou senha inválidos</span>
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success">
+            <span>✅</span> <span>Você saiu da sua conta</span>
+        </div>
+
+        <form th:action="@{/login}" method="post" class="login-form">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" class="form-control" autocomplete="username" required autofocus/>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" class="form-control" autocomplete="current-password" required/>
+            </div>
+            <button type="submit" class="btn btn-primary login-btn">Entrar</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
