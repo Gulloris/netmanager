@@ -2,9 +2,9 @@ package com.ispmanager.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -30,17 +30,35 @@ public class Usuario {
     @Column(name = "nome_completo")
     private String nomeCompleto;
 
+    /*
+     * Perfis disponíveis:
+     *
+     * ADMIN      - acesso total
+     * SUPORTE     - clientes e planos
+     * FINANCEIRO  - faturas
+     * USER        - acesso básico
+     */
     @Column(nullable = false)
-    private String role = "ADMIN";
+    private String role = "USER";
 
     @Column(nullable = false)
     private Boolean ativo = true;
 
-    @Column(name = "criado_em")
-    private LocalDateTime criadoEm = LocalDateTime.now();
+    @Column(name = "criado_em", nullable = false)
+    private LocalDateTime criadoEm;
 
     @PrePersist
     protected void onCreate() {
-        criadoEm = LocalDateTime.now();
+        if (criadoEm == null) {
+            criadoEm = LocalDateTime.now();
+        }
+
+        if (role == null || role.isBlank()) {
+            role = "USER";
+        }
+
+        if (ativo == null) {
+            ativo = true;
+        }
     }
 }

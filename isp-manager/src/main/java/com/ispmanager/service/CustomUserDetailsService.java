@@ -16,15 +16,24 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário ou senha inválidos"));
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
 
-        if (!usuario.getAtivo()) {
-            throw new UsernameNotFoundException("Usuário desativado");
+        Usuario usuario = usuarioRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuário ou senha inválidos"
+                        )
+                );
+
+        if (!Boolean.TRUE.equals(usuario.getAtivo())) {
+            throw new UsernameNotFoundException(
+                    "Usuário desativado"
+            );
         }
 
-        return User.withUsername(usuario.getUsername())
+        return User
+                .withUsername(usuario.getUsername())
                 .password(usuario.getPassword())
                 .roles(usuario.getRole())
                 .build();

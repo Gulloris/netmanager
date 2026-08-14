@@ -1,74 +1,240 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6"
-      th:replace="~{layout :: layout(~{::section}, 'Usuários')}"
-      lang="pt-BR">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Usuários | NetManager</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+</head>
+
 <body>
-<section th:fragment="content">
 
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Usuários</h1>
-            <p class="page-subtitle" th:text="${usuarios.size() + ' usuário(s) cadastrado(s)'}"></p>
+<div th:replace="~{layout :: layout(~{::main}, 'Usuários')}">
+
+    <main>
+
+        <!-- CABEÇALHO -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Usuários
+                </h1>
+
+                <p>
+                    Gerencie os usuários e permissões de acesso ao NetManager.
+                </p>
+
+            </div>
+
+            <a th:href="@{/usuarios/novo}"
+               class="btn btn-primary">
+
+                + Novo usuário
+
+            </a>
+
         </div>
-        <a th:href="@{/usuarios/novo}" class="btn btn-primary">+ Novo Usuário</a>
-    </div>
 
-    <div class="section-card">
-        <div th:if="${#lists.isEmpty(usuarios)}" class="empty-state">
-            <span>🔐</span>
-            <p>Nenhum usuário cadastrado.</p>
-            <a th:href="@{/usuarios/novo}" class="btn btn-primary">Cadastrar usuário</a>
+        <!-- MENSAGENS -->
+
+        <div th:if="${sucesso == 'criado'}"
+             class="alert alert-success">
+
+            Usuário cadastrado com sucesso.
+
         </div>
 
-        <table th:unless="${#lists.isEmpty(usuarios)}" class="table">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Usuário</th>
-                    <th>Perfil</th>
-                    <th>Status</th>
-                    <th>Criado em</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="u : ${usuarios}">
-                    <td>
-                        <strong th:text="${u.nomeCompleto ?: '—'}">—</strong>
-                    </td>
-                    <td th:text="${u.username}">usuario</td>
-                    <td>
-                        <span class="badge"
-                              th:classappend="${u.role == 'ADMIN' ? ' badge-pago' : ' badge-pendente'}"
-                              th:text="${u.role}">USER</span>
-                    </td>
-                    <td>
-                        <span th:if="${u.ativo}" class="badge badge-pago">Ativo</span>
-                        <span th:unless="${u.ativo}" class="badge badge-cancelado">Inativo</span>
-                    </td>
-                    <td th:text="${u.criadoEm != null ? #temporals.format(u.criadoEm, 'dd/MM/yyyy HH:mm') : '—'}">—</td>
-                    <td class="actions-cell">
-                        <a th:href="@{'/usuarios/' + ${u.id} + '/editar'}"
-                           class="btn btn-sm btn-outline">✏️ Editar</a>
+        <div th:if="${sucesso == 'atualizado'}"
+             class="alert alert-success">
 
-                        <form th:action="@{'/usuarios/' + ${u.id} + '/status'}"
-                              method="post" style="display:inline"
-                              th:if="${u.username != #authentication.name}">
-                            <button type="submit"
-                                    class="btn btn-sm"
-                                    th:classappend="${u.ativo ? ' btn-danger' : ' btn-success'}"
-                                    th:text="${u.ativo ? '🔒 Desativar' : '🔓 Ativar'}"
-                                    onclick="return confirm(this.innerText.includes('Desativar') ? 'Desativar este usuário?' : 'Ativar este usuário?')">
-                                Alterar
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+            Usuário atualizado com sucesso.
 
-</section>
+        </div>
+
+        <div th:if="${sucesso == 'status'}"
+             class="alert alert-success">
+
+            Status do usuário atualizado com sucesso.
+
+        </div>
+
+        <div th:if="${erro == 'proprio'}"
+             class="alert alert-danger">
+
+            Você não pode desativar o seu próprio usuário.
+
+        </div>
+
+        <!-- TABELA -->
+
+        <div class="card">
+
+            <div class="table-responsive">
+
+                <table class="data-table">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>Usuário</th>
+
+                        <th>Nome completo</th>
+
+                        <th>Perfil</th>
+
+                        <th>Status</th>
+
+                        <th>Criado em</th>
+
+                        <th class="text-right">
+                            Ações
+                        </th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:each="usuario : ${usuarios}">
+
+                        <td>
+
+                            <strong
+                                th:text="${usuario.username}">
+                                admin
+                            </strong>
+
+                        </td>
+
+                        <td
+                            th:text="${usuario.nomeCompleto != null && !usuario.nomeCompleto.isBlank()
+                            ? usuario.nomeCompleto
+                            : '-'}">
+                            Administrador
+                        </td>
+
+                        <td>
+
+                            <span th:switch="${usuario.role}">
+
+                                <span th:case="'ADMIN'"
+                                      class="badge badge-admin">
+                                    Administrador
+                                </span>
+
+                                <span th:case="'SUPORTE'"
+                                      class="badge badge-support">
+                                    Suporte
+                                </span>
+
+                                <span th:case="'FINANCEIRO'"
+                                      class="badge badge-finance">
+                                    Financeiro
+                                </span>
+
+                                <span th:case="*"
+                                      class="badge badge-user">
+                                    Usuário
+                                </span>
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span th:if="${usuario.ativo}"
+                                  class="badge badge-active">
+
+                                ● Ativo
+
+                            </span>
+
+                            <span th:unless="${usuario.ativo}"
+                                  class="badge badge-inactive">
+
+                                ● Inativo
+
+                            </span>
+
+                        </td>
+
+                        <td
+                            th:text="${usuario.criadoEm != null
+                            ? #temporals.format(usuario.criadoEm, 'dd/MM/yyyy HH:mm')
+                            : '-'}">
+
+                            13/08/2026 12:00
+
+                        </td>
+
+                        <td class="actions">
+
+                            <a th:href="@{'/usuarios/' + ${usuario.id} + '/editar'}"
+                               class="btn btn-small btn-secondary">
+
+                                Editar
+
+                            </a>
+
+                            <form th:action="@{'/usuarios/' + ${usuario.id} + '/status'}"
+                                  method="post"
+                                  style="display:inline;">
+
+                                <button type="submit"
+                                        class="btn btn-small"
+                                        th:classappend="${usuario.ativo ? 'btn-danger' : 'btn-success'}"
+                                        th:text="${usuario.ativo ? 'Desativar' : 'Ativar'}">
+
+                                    Desativar
+
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    <!-- SEM USUÁRIOS -->
+
+                    <tr th:if="${#lists.isEmpty(usuarios)}">
+
+                        <td colspan="6"
+                            class="empty-state">
+
+                            Nenhum usuário cadastrado.
+
+                        </td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
+
 </html>

@@ -32,10 +32,15 @@
         <span class="nav-icon">💰</span> Faturas
     </a></li>
     <li sec:authorize="hasRole('ADMIN')">
-        <a th:href="@{/usuarios}" th:classappend="${currentPage == 'usuarios' ? 'active' : ''}">
-            <span class="nav-icon">🔐</span> Usuários
-        </a>
-    </li>
+    <a th:href="@{/usuarios}"
+       th:classappend="${currentPage == 'usuarios' ? 'active' : ''}">
+
+        <span class="nav-icon">👤</span>
+
+        Usuários
+
+    </a>
+</li>
 </ul>
 
 <div class="sidebar-user">

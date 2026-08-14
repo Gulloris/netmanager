@@ -1,82 +1,270 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layout :: layout(~{::section}, 'Usuário')}"
-      lang="pt-BR">
+<html lang="pt-BR"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${usuario.id == null ? 'Novo Usuário' : 'Editar Usuário'} + ' | NetManager'">
+        Usuário | NetManager
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
 <body>
-<section th:fragment="content">
 
-    <div class="page-header">
-        <div>
-            <h1 class="page-title"
-                th:text="${usuario.id != null ? 'Editar Usuário' : 'Novo Usuário'}">Novo Usuário</h1>
-            <p class="page-subtitle">Gerencie o acesso à aplicação.</p>
+<div th:replace="~{layout :: layout(~{::main}, ${usuario.id == null ? 'Novo Usuário' : 'Editar Usuário'})}">
+
+    <main>
+
+        <div class="page-header">
+
+            <div>
+                <h1 th:text="${usuario.id == null ? 'Novo usuário' : 'Editar usuário'}">
+                    Novo usuário
+                </h1>
+
+                <p>
+                    Cadastre e gerencie o acesso dos usuários ao NetManager.
+                </p>
+            </div>
+
+            <a th:href="@{/usuarios}"
+               class="btn btn-secondary">
+                ← Voltar
+            </a>
+
         </div>
-        <a th:href="@{/usuarios}" class="btn btn-outline">← Voltar</a>
-    </div>
 
-    <div class="section-card" style="max-width:700px">
-        <form th:action="${usuario.id != null ? '/usuarios/' + usuario.id + '/editar' : '/usuarios/novo'}"
-              method="post" class="form-grid">
+        <!-- ERRO -->
 
-            <div class="form-group">
-                <label for="nomeCompleto">Nome completo *</label>
-                <input id="nomeCompleto" type="text" name="nomeCompleto"
-                       th:value="${usuario.nomeCompleto}" required class="form-control"
-                       placeholder="Ex: João da Silva"/>
-            </div>
+        <div th:if="${erro != null}"
+             class="alert alert-danger"
+             th:text="${erro}">
+            Erro
+        </div>
 
-            <div class="form-group">
-                <label for="username">Usuário *</label>
-                <input id="username" type="text" name="username"
-                       th:value="${usuario.username}" required class="form-control"
-                       placeholder="Ex: joao.silva" autocomplete="username"/>
-            </div>
+        <!-- FORMULÁRIO -->
 
-            <div class="form-group">
-                <label for="role">Perfil *</label>
-                <select id="role" name="role" class="form-control" required>
-                    <option value="USER" th:selected="${usuario.role == 'USER'}">Usuário</option>
-                    <option value="ADMIN" th:selected="${usuario.role == 'ADMIN'}">Administrador</option>
-                </select>
-            </div>
+        <div class="card">
 
-            <div class="form-group">
-                <label for="ativo">Status *</label>
-                <select id="ativo" name="ativo" class="form-control" required>
-                    <option value="true" th:selected="${usuario.ativo}">Ativo</option>
-                    <option value="false" th:selected="${!usuario.ativo}">Inativo</option>
-                </select>
-            </div>
+            <form th:object="${usuario}"
+                  th:action="${usuario.id == null ? '/usuarios/novo' : '/usuarios/' + usuario.id + '/editar'}"
+                  method="post">
 
-            <div class="form-group">
-                <label for="senha">Senha <span th:if="${usuario.id == null}">*</span></label>
-                <input id="senha" type="password" name="senha" class="form-control"
-                       th:required="${usuario.id == null}" minlength="6"
-                       autocomplete="new-password"
-                       th:placeholder="${usuario.id != null ? 'Deixe em branco para manter a senha atual' : 'Mínimo de 6 caracteres'}"/>
-                <span th:if="${usuario.id != null}" class="field-error">
-                    Deixe em branco caso não queira alterar a senha.
-                </span>
-            </div>
+                <div class="form-grid">
 
-            <div class="form-group">
-                <label for="confirmarSenha">Confirmar senha <span th:if="${usuario.id == null}">*</span></label>
-                <input id="confirmarSenha" type="password" name="confirmarSenha" class="form-control"
-                       th:required="${usuario.id == null}" minlength="6"
-                       autocomplete="new-password"
-                       placeholder="Repita a senha"/>
-            </div>
+                    <!-- NOME COMPLETO -->
 
-            <div class="form-actions full-width">
-                <a th:href="@{/usuarios}" class="btn btn-ghost">Cancelar</a>
-                <button type="submit" class="btn btn-primary"
-                        th:text="${usuario.id != null ? '💾 Salvar alterações' : '✅ Cadastrar usuário'}">
-                    Cadastrar usuário
-                </button>
-            </div>
-        </form>
-    </div>
+                    <div class="form-group">
 
-</section>
+                        <label for="nomeCompleto">
+                            Nome completo
+                        </label>
+
+                        <input type="text"
+                               id="nomeCompleto"
+                               th:field="*{nomeCompleto}"
+                               placeholder="Ex.: João da Silva"
+                               maxlength="150">
+
+                    </div>
+
+                    <!-- USUÁRIO -->
+
+                    <div class="form-group">
+
+                        <label for="username">
+                            Nome de usuário *
+                        </label>
+
+                        <input type="text"
+                               id="username"
+                               th:field="*{username}"
+                               placeholder="Ex.: joao.silva"
+                               required
+                               maxlength="50"
+                               autocomplete="username">
+
+                    </div>
+
+                    <!-- PERFIL -->
+
+                    <div class="form-group">
+
+                        <label for="role">
+                            Perfil de acesso *
+                        </label>
+
+                        <select id="role"
+                                th:field="*{role}"
+                                required>
+
+                            <option value="USER">
+                                Usuário
+                            </option>
+
+                            <option value="SUPORTE">
+                                Suporte
+                            </option>
+
+                            <option value="FINANCEIRO">
+                                Financeiro
+                            </option>
+
+                            <option value="ADMIN">
+                                Administrador
+                            </option>
+
+                        </select>
+
+                        <small>
+                            Define quais áreas do sistema o usuário poderá acessar.
+                        </small>
+
+                    </div>
+
+                    <!-- STATUS -->
+
+                    <div class="form-group">
+
+                        <label for="ativo">
+                            Status
+                        </label>
+
+                        <select id="ativo"
+                                th:field="*{ativo}">
+
+                            <option th:value="true">
+                                Ativo
+                            </option>
+
+                            <option th:value="false">
+                                Inativo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- SENHA -->
+
+                    <div class="form-group">
+
+                        <label for="senha">
+                            Senha
+                            <span th:if="${usuario.id == null}">*</span>
+                        </label>
+
+                        <input type="password"
+                               id="senha"
+                               name="senha"
+                               th:required="${usuario.id == null}"
+                               minlength="6"
+                               placeholder="Mínimo de 6 caracteres"
+                               autocomplete="new-password">
+
+                        <small th:if="${usuario.id != null}">
+                            Deixe em branco para manter a senha atual.
+                        </small>
+
+                    </div>
+
+                    <!-- CONFIRMAÇÃO -->
+
+                    <div class="form-group">
+
+                        <label for="confirmarSenha">
+                            Confirmar senha
+                            <span th:if="${usuario.id == null}">*</span>
+                        </label>
+
+                        <input type="password"
+                               id="confirmarSenha"
+                               name="confirmarSenha"
+                               th:required="${usuario.id == null}"
+                               minlength="6"
+                               placeholder="Digite a senha novamente"
+                               autocomplete="new-password">
+
+                    </div>
+
+                </div>
+
+                <!-- INFORMAÇÃO DOS PERFIS -->
+
+                <div class="permission-info">
+
+                    <h3>
+                        Perfis disponíveis
+                    </h3>
+
+                    <div class="permission-list">
+
+                        <div>
+                            <strong>Administrador</strong>
+                            <span>
+                                Acesso completo ao sistema e gerenciamento de usuários.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>Suporte</strong>
+                            <span>
+                                Acesso a clientes e planos.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>Financeiro</strong>
+                            <span>
+                                Acesso às faturas.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>Usuário</strong>
+                            <span>
+                                Acesso básico ao sistema.
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- BOTÕES -->
+
+                <div class="form-actions">
+
+                    <a th:href="@{/usuarios}"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <span th:text="${usuario.id == null ? 'Cadastrar usuário' : 'Salvar alterações'}">
+                            Salvar
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
+
 </html>

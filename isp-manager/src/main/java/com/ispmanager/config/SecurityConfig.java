@@ -18,27 +18,84 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http)
+            throws Exception {
+
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/css/**", "/js/**", "/favicon.ico").permitAll()
-                .requestMatchers("/usuarios/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+
+                /*
+                 * Páginas públicas
+                 */
+                .requestMatchers(
+                        "/login",
+                        "/css/**",
+                        "/js/**",
+                        "/favicon.ico"
+                ).permitAll()
+
+                /*
+                 * SOMENTE ADMIN
+                 */
+                .requestMatchers("/usuarios/**")
+                .hasRole("ADMIN")
+
+                /*
+                 * Clientes:
+                 * ADMIN + SUPORTE
+                 */
+                .requestMatchers("/clientes/**")
+                .hasAnyRole("ADMIN", "SUPORTE")
+
+                /*
+                 * Planos:
+                 * ADMIN + SUPORTE
+                 */
+                .requestMatchers("/planos/**")
+                .hasAnyRole("ADMIN", "SUPORTE")
+
+                /*
+                 * Faturas:
+                 * ADMIN + FINANCEIRO
+                 */
+                .requestMatchers("/faturas/**")
+                .hasAnyRole("ADMIN", "FINANCEIRO")
+
+                /*
+                 * Demais páginas precisam
+                 * de autenticação.
+                 */
+                .anyRequest()
+                .authenticated()
             )
+
+            /*
+             * Login
+             */
             .formLogin(form -> form
+
                 .loginPage("/login")
+
                 .loginProcessingUrl("/login")
+
                 .defaultSuccessUrl("/", true)
+
                 .failureUrl("/login?erro")
+
                 .permitAll()
             )
+
+            /*
+             * Logout
+             */
             .logout(logout -> logout
+
                 .logoutUrl("/logout")
+
                 .logoutSuccessUrl("/login?logout")
+
                 .permitAll()
             );
-            // CSRF permanece habilitado (padrão do Spring Security). O thymeleaf-extras-springsecurity6
-            // insere o token automaticamente em formulários que usam th:action.
 
         return http.build();
     }
